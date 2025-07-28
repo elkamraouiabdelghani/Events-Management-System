@@ -66,7 +66,7 @@ class EventController extends Controller
                 'region_id' => 'required|exists:regions,id',
                 'city_id' => 'required|exists:cities,id',
                 'date' => 'required|date',
-                'time' => 'required|date_format:H:i:s',
+                'time' => 'required|date_format:H:i',
                 'place' => 'required|string|max:255',
                 'event_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'organizer_title' => 'required_if:role,admin',
