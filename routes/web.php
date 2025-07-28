@@ -85,6 +85,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/{event}/request-update', [EventController::class, 'requestUpdate'])->name('events.requestUpdate');
         Route::get('/{event}/versions', [EventVersionController::class, 'index'])->name('events.versions');
     });
+    Route::get('/events-passed', [EventController::class, 'eventsPassed'])->name('events.passed');
+    Route::get('/events-canceled', [EventController::class, 'eventsCanceled'])->name('events.canceled');
+
+    // 
 });
 
 require __DIR__.'/auth.php';

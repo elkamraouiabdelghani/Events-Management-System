@@ -349,10 +349,6 @@ php artisan migrate:rollback
 - Ensure responsive design compatibility
 - Test across different browsers and devices
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🆘 Support
 
 For support and questions:
@@ -365,7 +361,3 @@ For support and questions:
 - Laravel team for the amazing framework
 - Bootstrap team for the UI components
 - All contributors who helped build this project
-
----
-
-**Made with ❤️ by the SG.Events Team**

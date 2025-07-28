@@ -188,7 +188,7 @@
                                     </div>
                                 </div>
                                 <div class="mt-4">
-                                    <a href="#" class="text-sm text-secondary hover:text-secondary-dark flex items-center font-semibold">
+                                    <a href="{{ route('events.passed') }}" class="text-sm text-secondary hover:text-secondary-dark flex items-center font-semibold">
                                         {{ __('Voir les événements passés') }}
                                         <i class="bi bi-arrow-right ml-1"></i>
                                     </a>
@@ -209,7 +209,7 @@
                                     </div>
                                 </div>
                                 <div class="mt-4">
-                                    <a href="#" class="text-sm text-danger hover:text-danger-dark flex items-center font-semibold">
+                                    <a href="{{ route('events.canceled') }}" class="text-sm text-danger hover:text-danger-dark flex items-center font-semibold">
                                         {{ __('Voir les événements annulés') }}
                                         <i class="bi bi-arrow-right ml-1"></i>
                                     </a>

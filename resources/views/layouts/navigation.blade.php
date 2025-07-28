@@ -65,13 +65,13 @@
                             </a>
                         </li>
                         <li class="mb-1">
-                            <a href="#" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('events.canceled') ? 'active' : '' }}">
+                            <a href="{{ route('events.canceled') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('events.canceled') ? 'active' : '' }}">
                                 <i class="bi bi-list-ul me-2 text-danger sidebar-icon"></i>
                                 <span class="sidebar-text">{{ __('Événements annulés') }}</span>
                             </a>
                         </li>
                         <li class="mb-1">
-                            <a href="#" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('events.passed') ? 'active' : '' }}">
+                            <a href="{{ route('events.passed') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('events.passed') ? 'active' : '' }}">
                                 <i class="bi bi-list-ul me-2 text-gray-500 sidebar-icon"></i>
                                 <span class="sidebar-text">{{ __('Événements passés') }}</span>
                             </a>
@@ -159,7 +159,7 @@
 
 <!-- Mobile Header -->
 <div class="d-md-none bg-white shadow-sm position-fixed w-100" style="top: 0; left: 0; z-index: 1000;">
-    <div class="d-flex justify-content-between align-items-center p-2">
+    <div class="d-flex justify-content-between align-items-center p-3">
         <button class="btn btn-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
             <i class="bi bi-list text-black"></i>
         </button>
@@ -177,14 +177,14 @@
         <button type="button" class="btn-close" style="position: fixed; right: 20px;" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body p-0">
-        <ul class="list-unstyled components p-3">
+        <ul class="list-unstyled components p-3" style="padding-bottom: 100px;">
             <li class="mb-2">
                 <a href="{{ route('dashboard') }}" class="text-dark text-decoration-none d-flex align-items-center p-2 {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-speedometer2 me-2 text-black"></i>
-                    {{ __('Tableau de bord') }}
+                    <i class="bi bi-speedometer2 me-2 text-black sidebar-icon"></i>
+                    <span class="sidebar-text text-dark">{{ __('Tableau de bord') }}</span>
                 </a>
             </li>
-        
+            
             @if(Auth::user()->role === 'admin')
                 {{-- Organisateurs --}}
                 <li class="mb-2">
@@ -198,13 +198,13 @@
                         <div class="collapse" id="organisateursSubmenu">
                             <ul class="list-unstyled ps-4 py-2">
                                 <li class="mb-1">
-                                    <a href="#" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 organizer-link {{ request()->routeIs('organisateurs') ? 'active' : '' }}">
+                                    <a href="{{ route('organizers') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 organizer-link {{ request()->routeIs('organisateurs') ? 'active' : '' }}">
                                         <i class="bi bi-list-ul me-2 text-info sidebar-icon"></i>
                                         <span class="sidebar-text">{{ __('Liste') }}</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 organizer-link {{ request()->routeIs('organisateurs.create') ? 'active' : '' }}">
+                                    <a href="{{ route('organizers.create') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 organizer-link {{ request()->routeIs('organisateurs.create') ? 'active' : '' }}">
                                         <i class="bi bi-plus-circle me-2 text-info sidebar-icon"></i>
                                         <span class="sidebar-text">{{ __('Ajouter') }}</span>
                                     </a>
@@ -227,13 +227,25 @@
                     <div class="collapse" id="evenementsSubmenu">
                         <ul class="list-unstyled ps-4 py-2">
                             <li class="mb-1">
-                                <a href="#" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('evenements') ? 'active' : '' }}">
+                                <a href="{{ route('events') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('evenements') ? 'active' : '' }}">
                                     <i class="bi bi-list-ul me-2 text-success sidebar-icon"></i>
                                     <span class="sidebar-text">{{ __('Liste') }}</span>
                                 </a>
                             </li>
+                            <li class="mb-1">
+                                <a href="{{ route('events.canceled') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('events.canceled') ? 'active' : '' }}">
+                                    <i class="bi bi-list-ul me-2 text-danger sidebar-icon"></i>
+                                    <span class="sidebar-text">{{ __('Événements annulés') }}</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="{{ route('events.passed') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('events.passed') ? 'active' : '' }}">
+                                    <i class="bi bi-list-ul me-2 text-gray-500 sidebar-icon"></i>
+                                    <span class="sidebar-text">{{ __('Événements passés') }}</span>
+                                </a>
+                            </li>
                             <li>
-                                <a href="#" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('evenements.create') ? 'active' : '' }}">
+                                <a href="{{ route('events.create') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('evenements.create') ? 'active' : '' }}">
                                     <i class="bi bi-plus-circle me-2 text-success sidebar-icon"></i>
                                     <span class="sidebar-text">{{ __('Ajouter') }}</span>
                                 </a>
@@ -242,7 +254,7 @@
                     </div>
                 </div>
             </li>
-
+    
             @if(Auth::user()->role === 'admin')
                 {{-- Paramètres --}}
                 <li class="mb-2">
@@ -256,21 +268,27 @@
                         <div class="collapse" id="parametresSubmenu">
                             <ul class="list-unstyled ps-4 py-2">
                                 <li class="mb-1">
-                                    <a href="#" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 settings-link {{ request()->routeIs('categories') ? 'active' : '' }}">
+                                    <a href="{{ route('categories') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 settings-link {{ request()->routeIs('categories') ? 'active' : '' }}">
                                         <i class="bi bi-tags me-2 text-secondary sidebar-icon"></i>
                                         <span class="sidebar-text">{{ __('Catégories') }}</span>
                                     </a>
                                 </li>
                                 <li class="mb-1">
-                                    <a href="#" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 settings-link {{ request()->routeIs('regions') ? 'active' : '' }}">
+                                    <a href="{{ route('regions') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 settings-link {{ request()->routeIs('regions') ? 'active' : '' }}">
                                         <i class="bi bi-globe me-2 text-secondary sidebar-icon"></i>
                                         <span class="sidebar-text">{{ __('Régions') }}</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 settings-link {{ request()->routeIs('villes') ? 'active' : '' }}">
+                                    <a href="{{ route('cities') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 settings-link {{ request()->routeIs('villes') ? 'active' : '' }}">
                                         <i class="bi bi-building me-2 text-secondary sidebar-icon"></i>
                                         <span class="sidebar-text">{{ __('Villes') }}</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('applications') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 settings-link {{ request()->routeIs('applications') ? 'active' : '' }}">
+                                        <i class="bi bi-grid-3x3-gap me-2 text-secondary sidebar-icon"></i>
+                                        <span class="sidebar-text">{{ __('Applications') }}</span>
                                     </a>
                                 </li>
                             </ul>
