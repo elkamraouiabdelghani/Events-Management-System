@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Region;
 use Illuminate\Http\Request;
+use App\Http\Requests\RegionRequest;
 
 class RegionController extends Controller
 {
@@ -32,16 +33,10 @@ class RegionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(RegionRequest $request)
     {
         try{
-            $request->validate([
-                'name' => 'required|string|max:255',
-            ], [
-                'name.required' => 'Le nom de la région est requis.',
-                'name.string' => 'Le nom de la région doit être une chaîne de caractères.',
-                'name.max' => 'Le nom de la région ne peut pas dépasser 255 caractères.',
-            ]);
+            $request->validated();
 
             Region::create($request->all());
 
@@ -70,16 +65,10 @@ class RegionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Region $region)
+    public function update(RegionRequest $request, Region $region)
     {
         try{
-            $request->validate([
-                'name' => 'required|string|max:255',
-            ], [
-                'name.required' => 'Le nom de la région est requis.',
-                'name.string' => 'Le nom de la région doit être une chaîne de caractères.',
-                'name.max' => 'Le nom de la région ne peut pas dépasser 255 caractères.',
-            ]);
+            $request->validated();
 
             $region->update(['name' => $request->name]);
 

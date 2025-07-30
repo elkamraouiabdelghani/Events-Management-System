@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Categorie;
 use Illuminate\Http\Request;
+use App\Http\Requests\CategoryRequest;
 
 class CategorieController extends Controller
 {
@@ -32,16 +33,10 @@ class CategorieController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
         try{
-            $request->validate([
-                'name' => 'required|string|max:255',
-            ], [
-                'name.required' => 'Le nom de la catégorie est requis.',
-                'name.string' => 'Le nom de la catégorie doit être une chaîne de caractères.',
-                'name.max' => 'Le nom de la catégorie ne peut pas dépasser 255 caractères.',
-            ]);
+            $request->validated();
 
             Categorie::create($request->all());
 
@@ -70,16 +65,10 @@ class CategorieController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Categorie $categorie)
+    public function update(CategoryRequest $request, Categorie $categorie)
     {
         try{
-            $request->validate([
-                'name' => 'required|string|max:255',
-            ], [
-                'name.required' => 'Le nom de la catégorie est requis.',
-                'name.string' => 'Le nom de la catégorie doit être une chaîne de caractères.',
-                'name.max' => 'Le nom de la catégorie ne peut pas dépasser 255 caractères.',
-            ]);
+            $request->validated();
 
             $categorie->update(['name' => $request->name]);
 

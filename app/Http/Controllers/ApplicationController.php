@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use App\Http\Requests\AppRequest;
 
 class ApplicationController extends Controller
 {
@@ -50,15 +51,9 @@ class ApplicationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(AppRequest $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'slogan' => 'nullable|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'favicon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,ico|max:1024',
-            'slider-image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5072',
-        ]);
+        $request->validated();
 
         $config = config('application');
         $logoPath = $config['logo'];

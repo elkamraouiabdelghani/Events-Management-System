@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Mail\OrganizerAccountCreated;
 use Illuminate\Support\Str;
+use App\Http\Requests\OrganizerRequest;
 
 class OrganizerController extends Controller
 {
@@ -44,37 +45,10 @@ class OrganizerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(OrganizerRequest $request)
     {
         try {
-            if(is_null($request->existing_organizer_id)){
-                $request->validate([
-                    'name' => 'required|string|max:255',
-                    'email' => 'required|email|unique:users,email',
-                    'password' => 'required|string|min:8',
-                    'title' => 'required|string|max:255',
-                    'phone_numbre' => 'nullable|string|max:10',
-                    'description' => 'nullable|string|max:255',
-                    'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                ],[
-                    'name.required' => 'Le nom est requis',
-                    'email.required' => 'L\'email est requis',
-                    'email.email' => 'L\'email doit être une adresse email valide',
-                    'email.unique' => 'L\'email existe déjà',
-                    'password.required' => 'Le mot de passe est requis',
-                    'password.min' => 'Le mot de passe doit contenir au moins 8 caractères',
-                    'title.required' => 'Le titre est requis',
-                    'image.image' => 'L\'image doit être une image valide',
-                    'image.mimes' => 'L\'image doit être au format jpeg, png, jpg, gif ou svg',
-                    'image.max' => 'L\'image ne doit pas dépasser 2Mo',
-                ]);
-            }else{
-                $request->validate([
-                    'existing_organizer_id' => 'required|exists:organizers,id',
-                ],[
-                    'existing_organizer_id.required' => 'L\'organisateur sélectionné est requis',
-                ]);
-            }
+            $request->validated();
 
             $user = User::create([
                 'name' => $request->name,
@@ -137,22 +111,10 @@ class OrganizerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Organizer $organizer)
+    public function update(OrganizerRequest $request, Organizer $organizer)
     {
         try{
-            $request->validate([
-                'title' => 'required|string|max:255',
-                'phone' => 'required|string|max:255',
-                'description' => 'required|string|max:255',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            ],[
-                'title.required' => 'Le titre est requis',
-                'phone.required' => 'Le numéro de téléphone est requis',
-                'description.required' => 'La description est requise',
-                'image.image' => 'L\'image doit être une image valide',
-                'image.mimes' => 'L\'image doit être au format jpeg, png, jpg, gif ou svg',
-                'image.max' => 'L\'image ne doit pas dépasser 2Mo',
-            ]);
+            $request->validated();
 
             $imageName = $organizer->image;
             if ($request->hasFile('image')) {

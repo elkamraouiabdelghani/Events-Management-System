@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\City;
 use App\Models\Region;
 use Illuminate\Http\Request;
+use App\Http\Requests\CityRequest;
 
 class CityController extends Controller
 {
@@ -34,19 +35,10 @@ class CityController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CityRequest $request)
     {
         try{
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'region_id' => 'required|exists:regions,id',
-            ], [
-                'name.required' => 'Le nom de la ville est requis.',
-                'name.string' => 'Le nom de la ville doit être une chaîne de caractères.',
-                'name.max' => 'Le nom de la ville ne peut pas dépasser 255 caractères.',
-                'region_id.required' => 'La région est requise.',
-                'region_id.exists' => 'La région sélectionnée n\'existe pas.',
-            ]);
+            $request->validated();
 
             City::create([
                 'name' => $request->name,
@@ -78,19 +70,10 @@ class CityController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, City $city)
+    public function update(CityRequest $request, City $city)
     {
         try{
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'region_id' => 'required|exists:regions,id',
-            ], [
-                'name.required' => 'Le nom de la ville est requis.',
-                'name.string' => 'Le nom de la ville doit être une chaîne de caractères.',
-                'name.max' => 'Le nom de la ville ne peut pas dépasser 255 caractères.',
-                'region_id.required' => 'La région est requise.',
-                'region_id.exists' => 'La région sélectionnée n\'existe pas.',
-            ]);
+            $request->validated();
 
             $city->update([
                 'name' => $request->name,

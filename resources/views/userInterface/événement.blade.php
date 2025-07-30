@@ -329,7 +329,7 @@
                                 @endif
                             </div>
                             <div class="col">
-                                <h4 class="fw-bold text-dark mb-2">{{ $event->organizer->user->name }}</h4>
+                                <h4 class="fw-bold text-dark mb-2">{{ $event->organizer->title }}</h4>
                                 <p class="text-muted mb-0">
                                     <i class="bi bi-calendar-event me-1"></i>
                                     Organisateur d'événements
