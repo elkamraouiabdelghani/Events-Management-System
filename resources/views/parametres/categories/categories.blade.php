@@ -51,7 +51,7 @@
                             <tbody>
                                 @forelse($categories as $category)
                                     <tr>
-                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ ($categories->currentPage() - 1) * $categories->perPage() + $loop->iteration }}</td>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="bg-primary bg-opacity-10 rounded-circle me-2" style="padding-top: 0.5rem;padding-left: 0.7rem;padding-right: 0.7rem;padding-bottom: 0.5rem;">
@@ -137,11 +137,10 @@
                         </table>
                     </div>
 
-                    {{-- @if($categories->hasPages())
-                        <div class="d-flex justify-content-center mt-4">
-                            {{ $categories->links() }}
-                        </div>
-                    @endif --}}
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-end mt-4">
+                        {{ $categories->links() }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -246,6 +245,33 @@
                 min-width: auto;
                 max-width: none;
             }
+        }
+        
+        /* Pagination Styles */
+        .pagination {
+            margin-bottom: 0;
+        }
+        .pagination .page-link {
+            border: none;
+            color: #6c757d;
+            padding: 0.5rem 0.75rem;
+            margin: 0 2px;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .pagination .page-link:hover {
+            background-color: #e9ecef;
+            color: #495057;
+            transform: translateY(-1px);
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #adb5bd;
+            background-color: transparent;
         }
     </style>
 

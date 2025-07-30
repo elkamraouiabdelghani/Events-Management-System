@@ -21,7 +21,7 @@ class OrganizerController extends Controller
     public function index()
     {
         try {
-            $organizers = Organizer::all();
+            $organizers = Organizer::paginate(10);
             return view('organizers.organizers', compact('organizers'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la récupération des organisateurs');

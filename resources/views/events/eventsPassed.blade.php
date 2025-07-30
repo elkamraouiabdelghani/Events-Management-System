@@ -26,7 +26,7 @@
                         <tbody>
                             @forelse($events as $event)
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ ($events->currentPage() - 1) * $events->perPage() + $loop->iteration }}</td>
                                     <td>{{ $event->title }}</td>
                                     <td>{{ $event->city->name ?? 'N/A' }}</td>
                                     <td class="event-place-cell">{{ $event->place }}</td>
@@ -124,6 +124,11 @@
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- Pagination -->
+                <div class="d-flex justify-content-end mt-4">
+                    {{ $events->links() }}
+                </div>
             </div>
         </div>
     </div>
@@ -134,6 +139,33 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+        
+        /* Pagination Styles */
+        .pagination {
+            margin-bottom: 0;
+        }
+        .pagination .page-link {
+            border: none;
+            color: #6c757d;
+            padding: 0.5rem 0.75rem;
+            margin: 0 2px;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .pagination .page-link:hover {
+            background-color: #e9ecef;
+            color: #495057;
+            transform: translateY(-1px);
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #adb5bd;
+            background-color: transparent;
         }
     </style>
 </x-app-layout>

@@ -14,7 +14,7 @@ class CategorieController extends Controller
     public function index()
     {
         try{
-            $categories = Categorie::all();
+            $categories = Categorie::paginate(10);
         } catch (\Exception $e) {
             return redirect()->route('categories')->with('error', 'Une erreur est survenue lors de la récupération des catégories.');
         }

@@ -65,13 +65,13 @@
                             </a>
                         </li>
                         <li class="mb-1">
-                            <a href="{{ route('events.canceled') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('events.canceled') ? 'active' : '' }}">
+                            <a href="{{ route('events.canceled') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('canceledEvents') ? 'active' : '' }}">
                                 <i class="bi bi-list-ul me-2 text-danger sidebar-icon"></i>
                                 <span class="sidebar-text">{{ __('Événements annulés') }}</span>
                             </a>
                         </li>
                         <li class="mb-1">
-                            <a href="{{ route('events.passed') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('events.passed') ? 'active' : '' }}">
+                            <a href="{{ route('events.passed') }}" class="text-dark text-decoration-none d-flex align-items-center py-2 px-2 event-link {{ request()->routeIs('passedEvents') ? 'active' : '' }}">
                                 <i class="bi bi-list-ul me-2 text-gray-500 sidebar-icon"></i>
                                 <span class="sidebar-text">{{ __('Événements passés') }}</span>
                             </a>

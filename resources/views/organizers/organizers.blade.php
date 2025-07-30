@@ -53,7 +53,7 @@
                             <tbody>
                                 @forelse($organizers as $organizer)
                                     <tr>
-                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ ($organizers->currentPage() - 1) * $organizers->perPage() + $loop->iteration }}</td>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="bg-info bg-opacity-10 rounded-circle me-2" style="padding: 0.5rem 0.7rem;">
@@ -140,6 +140,11 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-end mt-4">
+                        {{ $organizers->links() }}
                     </div>
                 </div>
             </div>
@@ -233,6 +238,33 @@
         .modal-body img.img-fluid {
             border-radius: 1rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        
+        /* Pagination Styles */
+        .pagination {
+            margin-bottom: 0;
+        }
+        .pagination .page-link {
+            border: none;
+            color: #6c757d;
+            padding: 0.5rem 0.75rem;
+            margin: 0 2px;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .pagination .page-link:hover {
+            background-color: #e9ecef;
+            color: #495057;
+            transform: translateY(-1px);
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #0dcaf0;
+            border-color: #0dcaf0;
+            color: white;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #adb5bd;
+            background-color: transparent;
         }
     </style>
     <script>

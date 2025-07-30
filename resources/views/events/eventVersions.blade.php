@@ -31,7 +31,7 @@
                         <tbody>
                             @forelse($eventVersions as $version)
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ ($eventVersions->currentPage() - 1) * $eventVersions->perPage() + $loop->iteration }}</td>
                                     <td>{{ $version->title }}</td>
                                     <td>{{ $version->category->name ?? 'N/A' }}</td>
                                     <td>{{ $version->region->name ?? 'N/A' }}</td>
@@ -126,7 +126,41 @@
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- Pagination -->
+                <div class="d-flex justify-content-end mt-4">
+                    {{ $eventVersions->links() }}
+                </div>
             </div>
         </div>
     </div>
+    
+    <style>
+        /* Pagination Styles */
+        .pagination {
+            margin-bottom: 0;
+        }
+        .pagination .page-link {
+            border: none;
+            color: #6c757d;
+            padding: 0.5rem 0.75rem;
+            margin: 0 2px;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .pagination .page-link:hover {
+            background-color: #e9ecef;
+            color: #495057;
+            transform: translateY(-1px);
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #adb5bd;
+            background-color: transparent;
+        }
+    </style>
 </x-app-layout>

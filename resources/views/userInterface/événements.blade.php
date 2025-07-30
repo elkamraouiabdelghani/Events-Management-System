@@ -187,7 +187,7 @@
                                     @if($event->organizer)
                                         <div class="d-flex align-items-center mb-3">
                                             <i class="bi bi-person-circle text-primary me-2"></i>
-                                            <small class="text-muted">{{ $event->organizer->name }}</small>
+                                            <small class="text-muted">{{ $event->organizer->title }}</small>
                                         </div>
                                     @endif
 

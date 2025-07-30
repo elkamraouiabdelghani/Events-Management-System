@@ -15,7 +15,7 @@ class UserInterfaceController extends Controller
     public function index()
     {
         try {
-            $events = Event::all();
+            $events = Event::where('status', 'publish')->get();
             $categories = Categorie::all();
             $regions = Region::all();
             $cities = City::all();
@@ -30,9 +30,9 @@ class UserInterfaceController extends Controller
     {
         try {
             $query = Event::with(['organizer', 'category', 'city', 'region'])
-                         ->where('status', 'published');
+                        ->where('status', 'publish');
 
-            // Apply filters
+            // // Apply filters
             if ($request->filled('category')) {
                 $query->where('category_id', $request->category);
             }
@@ -63,7 +63,7 @@ class UserInterfaceController extends Controller
             }
 
             $events = $query->orderBy('date', 'asc')
-                           ->paginate(9);
+                           ->paginate(10);
 
             $categories = Categorie::all();
             $regions = Region::all();

@@ -15,7 +15,7 @@ class CityController extends Controller
     public function index()
     {
         try{
-            $cities = City::with('region')->get();
+            $cities = City::with('region')->paginate(10);
             $regions = Region::all();
         } catch (\Exception $e) {
             return redirect()->route('cities')->with('error', 'Une erreur est survenue lors de la récupération des villes.');

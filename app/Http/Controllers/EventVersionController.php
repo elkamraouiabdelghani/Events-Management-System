@@ -14,7 +14,7 @@ class EventVersionController extends Controller
     public function index(Event $event)
     {
         try {
-            $eventVersions = Event_version::where('event_id', $event->id)->get();
+            $eventVersions = Event_version::where('event_id', $event->id)->paginate(10);
 
             return view('events.eventVersions', compact('eventVersions', 'event'));
         } catch (\Exception $e) {

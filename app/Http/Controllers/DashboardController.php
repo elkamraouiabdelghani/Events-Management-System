@@ -57,8 +57,7 @@ class DashboardController extends Controller
                 $newEvents = Event::where('status', 'new')
                         ->where('organizer_id', Auth::user()->organizer->id)
                         ->orderBy('created_at', 'desc')
-                        ->take(5)
-                        ->get();
+                        ->paginate(4);
                 $eventsPerMonth = Event::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
                     ->where('organizer_id', Auth::user()->organizer->id)
                     ->whereYear('created_at', $selectedYear)
@@ -67,8 +66,7 @@ class DashboardController extends Controller
             } else {
                 $newEvents = Event::whereIn('status', ['new','updated'])
                         ->orderBy('created_at', 'desc')
-                        ->take(5)
-                        ->get();
+                        ->paginate(4);
                 $eventsPerMonth = Event::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
                     ->whereYear('created_at', $selectedYear)
                     ->groupBy('month')

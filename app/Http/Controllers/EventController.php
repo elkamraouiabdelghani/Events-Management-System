@@ -28,9 +28,9 @@ class EventController extends Controller
         try {
             Event::updatePassedEvents();
             if(Auth::user()->role === 'admin'){
-                $events = Event::orderBy('created_at', 'desc')->get();
+                $events = Event::orderBy('created_at', 'desc')->paginate(10);
             }else{
-                $events = Event::where('organizer_id', Auth::user()->organizer->id)->orderBy('created_at', 'desc')->get();
+                $events = Event::where('organizer_id', Auth::user()->organizer->id)->orderBy('created_at', 'desc')->paginate(10);
             }
             return view('events.events', compact('events'));
         } catch (\Exception $e) {
@@ -316,9 +316,9 @@ class EventController extends Controller
             }
 
             if(Auth::user()->role == 'admin'){
-                $events = Organizer_historic::all();
+                $events = Organizer_historic::paginate(10);
             }else{
-                $events = Organizer_historic::where('organizer_id', Auth::user()->organizer->id)->get();
+                $events = Organizer_historic::where('organizer_id', Auth::user()->organizer->id)->paginate(10);
             }
 
             return view('events.eventsPassed', compact('events'));
@@ -334,9 +334,9 @@ class EventController extends Controller
     {
         try {
             if(Auth::user()->role === 'admin'){
-                $events = Canceled_event::all();
+                $events = Canceled_event::paginate(10);
             }else{
-                $events = Canceled_event::where('organizer_id', Auth::user()->organizer->id)->get();
+                $events = Canceled_event::where('organizer_id', Auth::user()->organizer->id)->paginate(10);
             }
 
             return view('events.eventsCanceled', compact('events'));

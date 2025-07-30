@@ -14,7 +14,7 @@ class RegionController extends Controller
     public function index()
     {
         try{
-            $regions = Region::all();
+            $regions = Region::paginate(10);
         } catch (\Exception $e) {
             return redirect()->route('regions')->with('error', 'Une erreur est survenue lors de la récupération des régions.');
         }
