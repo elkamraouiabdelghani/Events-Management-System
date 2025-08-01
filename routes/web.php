@@ -18,6 +18,7 @@ Route::prefix('/')->group(function(){
     Route::get('/', [UserInterfaceController::class, 'index'])->name('Accueil');
     Route::get('/Événements', [UserInterfaceController::class, 'events'])->name('Événements');
     Route::get('/événements/{event}', [UserInterfaceController::class, 'show'])->name('événement');
+    Route::get('/contact', [UserInterfaceController::class, 'contact'])->name('contact');
 });
 
 Route::get('/event-admin', function () {

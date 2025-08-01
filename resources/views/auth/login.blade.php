@@ -13,7 +13,7 @@
             <div class="w-100 text-center">
                 <a href="/">
                     {{-- <img src="{{ asset('#') }}" alt="Events_logo" width="50%" style="margin: auto;"> --}}
-                    <span class="fw-bolder text-black fs-1">Events</span>
+                    <span class="fw-bolder text-black fs-1">Événements</span>
                 </a>
             </div>
         
@@ -46,7 +46,7 @@
         
                 <!-- Password -->
                 <div class="mt-4">
-                    <x-input-label for="password" :value="__('Password')" />
+                    <x-input-label for="password" :value="__('Mot de passe')" />
         
                     <x-text-input id="password" class="block mt-1 w-full"
                                     type="password"
@@ -60,19 +60,19 @@
                 <div class="block mt-4">
                     <label for="remember_me" class="inline-flex items-center">
                         <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                        <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                        <span class="ms-2 text-sm text-gray-600">{{ __('Se souvenir de moi') }}</span>
                     </label>
                 </div>
         
                 <div class="flex items-center justify-end mt-4">
                     @if (Route::has('password.request'))
                         <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                            {{ __('Forgot your password?') }}
+                            {{ __('Mot de passe oublié ?') }}
                         </a>
                     @endif
         
                     <x-primary-button class="ms-3">
-                        {{ __('Log in') }}
+                        {{ __('Se connecter') }}
                     </x-primary-button>
                 </div>
             </form>

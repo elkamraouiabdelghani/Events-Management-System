@@ -589,10 +589,16 @@
                             <i class="bi bi-graph-up-arrow text-primary mr-1"></i>
                             {{ __('Évolution des événements créés par mois') }}
                         </h3>
-                        <form method="GET" action="" class="d-flex align-items-center" style="max-width: 250px;">
+                        <form method="GET" action="" class="d-flex align-items-center gap-2" style="max-width: 400px;">
                             <select name="year" id="yearSelect" class="form-select form-select-sm" onchange="this.form.submit()">
                                 @foreach($years as $year)
                                     <option value="{{ $year }}" @if($year == $selectedYear) selected @endif>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                            <select name="region" id="regionSelect" class="form-select form-select-sm" onchange="this.form.submit()">
+                                <option value="">{{ __('Toutes les régions') }}</option>
+                                @foreach($regions as $region)
+                                    <option value="{{ $region->id }}" @if($region->id == $selectedRegion) selected @endif>{{ $region->name }}</option>
                                 @endforeach
                             </select>
                         </form>

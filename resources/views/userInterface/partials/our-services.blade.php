@@ -133,7 +133,7 @@
         </div>
 
         <!-- Call to Action -->
-        <div class="text-center mt-5">
+        {{-- <div class="text-center mt-5">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <h4 class="fw-bold text-dark mb-3">Prêt à Commencer ?</h4>
@@ -150,7 +150,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 
     <style>

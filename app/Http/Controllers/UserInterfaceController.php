@@ -15,7 +15,14 @@ class UserInterfaceController extends Controller
     public function index()
     {
         try {
-            $events = Event::where('status', 'publish')->get();
+            $events = Event::with(['organizer', 'category', 'city', 'region'])
+                          ->where('status', 'publish')
+                          ->where('date', '>=', now()->toDateString()) // Only future events
+                          ->orderBy('date', 'asc')
+                          ->orderBy('time', 'asc')
+                          ->limit(6)
+                          ->get();
+            
             $categories = Categorie::all();
             $regions = Region::all();
             $cities = City::all();
@@ -92,5 +99,12 @@ class UserInterfaceController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function contact()
+    {
+        $regions = Region::all();
+        $categories = Categorie::all();
+        return view('userInterface.contact', compact('regions', 'categories'));
     }
 }

@@ -4,9 +4,9 @@
         <div class="text-center mb-5">
             <h2 class="display-6 fw-bold text-dark mb-3">
                 {{-- <i class="bi bi-calendar-event me-2 text-primary"></i> --}}
-                Derniers Événements
+                Prochains événements
             </h2>
-            <p class="text-muted fs-5">Découvrez les événements les plus récents</p>
+            <p class="text-muted fs-5">Découvrez les prochains événements</p>
         </div>
 
         @if($events && $events->count() > 0)

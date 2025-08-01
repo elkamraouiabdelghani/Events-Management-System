@@ -47,8 +47,9 @@ class EventController extends Controller
             $categories = Categorie::all();
             $regions = Region::with('cities')->get();
             $cities = City::all();
+            $organizers = Organizer::all();
 
-            return view('events.create', compact('categories', 'regions', 'cities'));
+            return view('events.create', compact('categories', 'regions', 'cities', 'organizers'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -61,15 +62,26 @@ class EventController extends Controller
     {
         try {
             $request->validated();
+            // return dd('good');
 
             $organizerId = null;
+            $organizerName = null;
             if (auth()->user()->role === 'admin') {
-                // Create a new organizer with just the title
-                $organizer = Organizer::create([
-                    // 'user_id' => 0,
-                    'title' => $request->organizer_title,
-                ]);
-                $organizerId = $organizer->id;
+                // Handle organizer based on type selection
+                if($request->organizer_type === 'new'){
+                    $organizer = Organizer::create([
+                        'title' => $request->organizer_title,
+                    ]);
+                    $organizerId = $organizer->id;
+                    $organizerName = $request->organizer_title;
+                }else{
+                    $organizer = Organizer::find($request->existing_organizer_id);
+                    if (!$organizer) {
+                        return redirect()->back()->withInput()->with('error', 'Organisateur sélectionné introuvable');
+                    }
+                    $organizerId = $organizer->id;
+                    $organizerName = $organizer->title;
+                }
 
                 // Handle image upload
                 $imageName = null;
@@ -81,7 +93,7 @@ class EventController extends Controller
 
                 $event = new Event([
                     'organizer_id' => $organizerId,
-                    'organizer_name' => $request->organizer_title,
+                    'organizer_name' => $organizerName,
                     'title' => $request->title,
                     'description' => $request->description,
                     'category_id' => $request->category_id,

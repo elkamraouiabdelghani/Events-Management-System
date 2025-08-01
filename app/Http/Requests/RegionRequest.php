@@ -11,7 +11,15 @@ class RegionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Check if user is authenticated
+        if (!auth()->check()) {
+            return false;
+        }
+
+        $user = auth()->user();
+        
+        // Only admin can manage regions
+        return $user->role === 'admin';
     }
 
     /**

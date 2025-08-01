@@ -51,6 +51,7 @@
                     </select>
                     @error('city_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
+
                 <div class="mb-3">
                     <label for="place" class="form-label">Lieu 
                         <span class="text-danger">*</span>
@@ -111,9 +112,62 @@
                 </div>
                 @if(Auth::user()->role === 'admin')
                     <div class="mb-3">
-                        <label for="organizer_title" class="form-label">Nom de l'organisateur <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control rounded @error('organizer_title') is-invalid @enderror" id="organizer_title" name="organizer_title" value="{{ old('organizer_title') }}" required>
-                        @error('organizer_title')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <label class="form-label">Organisateur <span class="text-danger">*</span></label>
+                        
+                        <!-- Toggle Buttons -->
+                        <div class="btn-group w-100 mb-3" role="group" aria-label="Organizer type selection">
+                            <input type="radio" class="btn-check" name="organizer_type" id="new_organizer" value="new" checked>
+                            <label class="btn btn-outline-primary" for="new_organizer">
+                                <i class="bi bi-plus-circle me-2"></i>Nouvel Organisateur
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="organizer_type" id="existing_organizer" value="existing">
+                            <label class="btn btn-outline-primary" for="existing_organizer">
+                                <i class="bi bi-list-ul me-2"></i>Organisateur Existant
+                            </label>
+                        </div>
+
+                        <!-- New Organizer Input -->
+                        <div id="new_organizer_section">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-person-plus"></i>
+                                </span>
+                                <input type="text" class="form-control rounded-end @error('organizer_title') is-invalid @enderror" 
+                                       id="organizer_title" name="organizer_title" 
+                                       value="{{ old('organizer_title') }}" 
+                                       placeholder="Nom du nouvel organisateur">
+                                @error('organizer_title')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Créez un nouvel organisateur pour cet événement
+                            </div>
+                        </div>
+
+                        <!-- Existing Organizer Dropdown -->
+                        <div id="existing_organizer_section" style="display: none;">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-person-check"></i>
+                                </span>
+                                <select class="form-select rounded-end @error('existing_organizer_id') is-invalid @enderror" 
+                                        id="existing_organizer_id" name="existing_organizer_id">
+                                    <option value="">Sélectionner un organisateur existant</option>
+                                    @foreach($organizers as $organizer)
+                                        <option value="{{ $organizer->id }}" {{ old('existing_organizer_id') == $organizer->id ? 'selected' : '' }}>
+                                            {{ $organizer->title }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('existing_organizer_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Choisissez parmi les organisateurs existants
+                            </div>
+
+                        </div>
                     </div>
                 @elseif(Auth::user()->role === 'organizer' && Auth::user()->organizer)
                     <input type="hidden" name="organizer_id" value="{{ Auth::user()->organizer->id }}">
@@ -231,282 +285,291 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        /* Modern toggle button styles */
+        .btn-group .btn-check:checked + .btn {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .btn-group .btn-check:not(:checked) + .btn {
+            background-color: transparent;
+            border-color: #dee2e6;
+            color: #6c757d;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn-group .btn-check:not(:checked) + .btn:hover {
+            background-color: #f8f9fa;
+            border-color: #0d6efd;
+            color: #0d6efd;
+        }
+        
+        /* Smooth transitions for organizer sections */
+        #new_organizer_section,
+        #existing_organizer_section {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Input group styling */
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+        }
+        
+        .form-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+    </style>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded');
-            
-            const regionSelect = document.getElementById('region_id');
-            const citySelect = document.getElementById('city_id');
-            
-            if (regionSelect && citySelect) {
-                regionSelect.addEventListener('change', function() {
-                    const selectedOption = regionSelect.options[regionSelect.selectedIndex];
-                    const cities = selectedOption.getAttribute('data-cities');
-                    citySelect.innerHTML = '<option value="">Sélectionner une ville</option>';
-                    if (cities) {
-                        const citiesArr = JSON.parse(cities);
-                        if (citiesArr.length > 0) {
-                            citySelect.disabled = false;
-                            citiesArr.forEach(city => {
-                                const option = document.createElement('option');
-                                option.value = city.id;
-                                option.textContent = city.name;
-                                citySelect.appendChild(option);
-                            });
-                        } else {
-                            citySelect.disabled = true;
-                        }
-                    } else {
-                        citySelect.disabled = true;
-                    }
-                });
-            }
+            // Initialize all required elements
+            const elements = {
+                eventForm: document.getElementById('eventForm'),
+                openConfirmModalBtn: document.getElementById('openConfirmModal'),
+                confirmModalElement: document.getElementById('confirmModal'),
+                confirmSubmitBtn: document.getElementById('confirmSubmit'),
+                validationErrorModalElement: document.getElementById('validationErrorModal'),
+                validationErrorList: document.getElementById('validationErrorList'),
+                openMapModalBtn: document.getElementById('openMapModal'),
+                mapModalElement: document.getElementById('mapModal'),
+                mapAddress: document.getElementById('mapAddress'),
+                selectLocationBtn: document.getElementById('selectLocationBtn'),
+                placeInput: document.getElementById('place'),
+                mapSearchInput: document.getElementById('mapSearchInput'),
+                mapSearchBtn: document.getElementById('mapSearchBtn'),
+                mapSearchError: document.getElementById('mapSearchError'),
+                closeMapModal: document.getElementsByClassName('closeMapModal')
+            };
 
-            const eventForm = document.getElementById('eventForm');
-            const openConfirmModalBtn = document.getElementById('openConfirmModal');
-            const confirmModalElement = document.getElementById('confirmModal');
-            const confirmSubmitBtn = document.getElementById('confirmSubmit');
-            const validationErrorModalElement = document.getElementById('validationErrorModal');
-            const validationErrorList = document.getElementById('validationErrorList');
-
-            console.log('Elements found:', {
-                eventForm: !!eventForm,
-                openConfirmModalBtn: !!openConfirmModalBtn,
-                confirmModalElement: !!confirmModalElement,
-                confirmSubmitBtn: !!confirmSubmitBtn,
-                validationErrorModalElement: !!validationErrorModalElement,
-                validationErrorList: !!validationErrorList
-            });
+            // Check if Bootstrap is available
+            const hasBootstrap = typeof bootstrap !== 'undefined';
 
             // Initialize modals
-            let confirmModal, validationErrorModal;
-            if (typeof bootstrap !== 'undefined') {
-                confirmModal = new bootstrap.Modal(confirmModalElement);
-                validationErrorModal = new bootstrap.Modal(validationErrorModalElement);
-            } else {
-                // Fallback modal implementations
-                confirmModal = {
-                    show: function() {
-                        confirmModalElement.style.display = 'block';
-                        confirmModalElement.classList.add('show');
-                        document.body.classList.add('modal-open');
-                    }
-                };
-                validationErrorModal = {
-                    show: function() {
-                        validationErrorModalElement.style.display = 'block';
-                        validationErrorModalElement.classList.add('show');
-                        document.body.classList.add('modal-open');
-                    }
-                };
+            let confirmModal, validationErrorModal, mapModal;
+            if (hasBootstrap) {
+                if (elements.confirmModalElement) {
+                    confirmModal = new bootstrap.Modal(elements.confirmModalElement);
+                }
+                if (elements.validationErrorModalElement) {
+                    validationErrorModal = new bootstrap.Modal(elements.validationErrorModalElement);
+                }
+                if (elements.mapModalElement) {
+                    mapModal = new bootstrap.Modal(elements.mapModalElement);
+                }
             }
 
-            if (openConfirmModalBtn) {
-                openConfirmModalBtn.addEventListener('click', function(e) {
-                    console.log('Button clicked');
-                    e.preventDefault();
-                    
-                    // Validate form before showing modal
-                    const requiredFields = [
-                        { id: 'title', name: 'Titre' },
-                        { id: 'description', name: 'Description' },
-                        { id: 'category_id', name: 'Catégorie' },
-                        { id: 'region_id', name: 'Région' },
-                        { id: 'city_id', name: 'Ville' },
-                        { id: 'place', name: 'Lieu' },
-                        { id: 'date', name: 'Date' },
-                        { id: 'time', name: 'Heure' }
-                    ];
-                    
-                    @if(Auth::user()->role === 'admin')
-                    requiredFields.push({ id: 'organizer_title', name: 'Nom de l\'organisateur' });
-                    @endif
-                    
-                    const missingFields = [];
-                    
-                    requiredFields.forEach(field => {
-                        const element = document.getElementById(field.id);
-                        if (!element || !element.value.trim()) {
-                            missingFields.push(field.name);
-                            if (element) {
-                                element.classList.add('is-invalid');
-                            }
-                        } else {
-                            if (element) {
-                                element.classList.remove('is-invalid');
-                            }
-                        }
-                    });
-                    
-                    if (missingFields.length > 0) {
-                        // Show error message
-                        validationErrorList.innerHTML = '<ul>' + missingFields.map(name => `<li>${name}</li>`).join('') + '</ul>';
-                        validationErrorModal.show();
-                        return;
-                    }
-                    
-                    // Fill modal with form data
-                    const title = document.getElementById('title').value;
-                    const description = document.getElementById('description').value;
-                    const category = document.getElementById('category_id').selectedOptions[0]?.textContent || '';
-                    const region = document.getElementById('region_id').selectedOptions[0]?.textContent || '';
-                    const city = document.getElementById('city_id').selectedOptions[0]?.textContent || '';
-                    const place = document.getElementById('place').value;
-                    const date = document.getElementById('date').value;
-                    const time = document.getElementById('time').value;
-                    
-                    console.log('Form data:', { title, description, category, region, city, place, date, time });
-
-                    document.getElementById('confTitle').textContent = title;
-                    document.getElementById('confDescription').textContent = description;
-                    document.getElementById('confCategory').textContent = category;
-                    document.getElementById('confRegion').textContent = region;
-                    document.getElementById('confCity').textContent = city;
-                    document.getElementById('confPlace').textContent = place;
-                    document.getElementById('confDate').textContent = date;
-                    document.getElementById('confTime').textContent = time;
-                    
-                    @if(Auth::user()->role === 'admin')
-                    const organizer = document.getElementById('organizer_title').value;
-                    document.getElementById('confOrganizer').textContent = organizer;
-                    @endif
-
-                    // Show modal using Bootstrap
-                    if (typeof bootstrap !== 'undefined') {
-                        const confirmModal = new bootstrap.Modal(confirmModalElement);
-                        confirmModal.show();
+            // Modal utility functions
+            const modalUtils = {
+                show: function(modalElement, modalInstance) {
+                    if (hasBootstrap && modalInstance) {
+                        modalInstance.show();
                     } else {
-                        // Fallback: show modal manually
-                        confirmModalElement.style.display = 'block';
-                        confirmModalElement.classList.add('show');
+                        modalElement.style.display = 'block';
+                        modalElement.classList.add('show');
                         document.body.classList.add('modal-open');
                         const backdrop = document.createElement('div');
                         backdrop.className = 'modal-backdrop fade show';
                         document.body.appendChild(backdrop);
                     }
-                });
-            }
-
-            if (confirmSubmitBtn) {
-                confirmSubmitBtn.addEventListener('click', function() {
-                    console.log('Confirm clicked');
-                    if (eventForm) {
-                        eventForm.submit();
-                    }
-                });
-            }
-
-            // Close modal when clicking outside or on close button
-            // Only add manual close for fallback (when Bootstrap is not available)
-            if (typeof bootstrap === 'undefined') {
-                const closeButtons = document.querySelectorAll('[data-bs-dismiss="modal"], .btn-close');
-                closeButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        confirmModalElement.style.display = 'none';
-                        confirmModalElement.classList.remove('show');
-                        validationErrorModalElement.style.display = 'none';
-                        validationErrorModalElement.classList.remove('show');
+                },
+                hide: function(modalElement, modalInstance) {
+                    if (hasBootstrap && modalInstance) {
+                        modalInstance.hide();
+                    } else {
+                        modalElement.style.display = 'none';
+                        modalElement.classList.remove('show');
                         document.body.classList.remove('modal-open');
                         const backdrop = document.querySelector('.modal-backdrop');
                         if (backdrop) backdrop.remove();
-                    });
-                });
-            }
-
-            // Close modal when clicking on backdrop
-            const modals = [confirmModalElement, validationErrorModalElement];
-            modals.forEach(modal => {
-                if (modal) {
-                    modal.addEventListener('click', function(e) {
-                        if (e.target === modal) {
-                            if (typeof bootstrap !== 'undefined') {
-                                const modalInstance = bootstrap.Modal.getInstance(modal);
-                                if (modalInstance) modalInstance.hide();
-                            } else {
-                                modal.style.display = 'none';
-                                modal.classList.remove('show');
-                                document.body.classList.remove('modal-open');
-                                const backdrop = document.querySelector('.modal-backdrop');
-                                if (backdrop) backdrop.remove();
-                            }
-                        }
-                    });
-                }
-            });
-
-            // Map modal logic
-            const closeMapModal = document.getElementsByClassName('closeMapModal');
-            const openMapModalBtn = document.getElementById('openMapModal');
-            const mapModalElement = document.getElementById('mapModal');
-            let map, marker, selectedLatLng, selectedAddress;
-            const mapAddress = document.getElementById('mapAddress');
-            const selectLocationBtn = document.getElementById('selectLocationBtn');
-            const placeInput = document.getElementById('place');
-            let mapInitialized = false;
-            // Search elements
-            const mapSearchInput = document.getElementById('mapSearchInput');
-            const mapSearchBtn = document.getElementById('mapSearchBtn');
-            const mapSearchError = document.getElementById('mapSearchError');
-            let mapModal = null;
-
-            if (typeof bootstrap !== 'undefined' && mapModalElement) {
-                mapModal = new bootstrap.Modal(mapModalElement);
-                mapModalElement.addEventListener('hidden.bs.modal', function() {
-                    mapModalElement.style.display = 'none';
-                    mapModalElement.classList.remove('show');
-                    document.body.classList.remove('modal-open');
-                    const backdrop = document.querySelector('.modal-backdrop');
-                    if (backdrop) backdrop.remove();
-                });
-            }
-
-            if (openMapModalBtn && mapModalElement) {
-                openMapModalBtn.addEventListener('click', function() {
-                    if (typeof bootstrap !== 'undefined' && mapModal) {
-                        mapModal.show();
-                    } else {
-                        mapModalElement.style.display = 'block';
-                        mapModalElement.classList.add('show');
-                        document.body.classList.add('modal-open');
-                        const backdrop = document.createElement('div');
-                        backdrop.className = 'modal-backdrop fade show';
-                        document.body.appendChild(backdrop);
                     }
-                    setTimeout(() => {
-                        if (!mapInitialized) {
-                            map = L.map('eventMap').setView([31.7917, -7.0926], 6); // Morocco center
-                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                maxZoom: 19,
-                                attribution: '© OpenStreetMap'
-                            }).addTo(map);
-                            map.on('click', function(e) {
-                                if (marker) map.removeLayer(marker);
-                                marker = L.marker(e.latlng).addTo(map);
-                                selectedLatLng = e.latlng;
-                                // Reverse geocode
-                                fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        selectedAddress = data.display_name || `${e.latlng.lat}, ${e.latlng.lng}`;
-                                        mapAddress.textContent = selectedAddress;
-                                    })
-                                    .catch(() => {
-                                        selectedAddress = `${e.latlng.lat}, ${e.latlng.lng}`;
-                                        mapAddress.textContent = selectedAddress;
-                                    });
-                            });
-                            mapInitialized = true;
-                        } else {
-                            map.invalidateSize();
+                }
+            };
+
+            // Form validation function
+            function validateForm() {
+                const requiredFields = [
+                    { id: 'title', name: 'Titre' },
+                    { id: 'description', name: 'Description' },
+                    { id: 'category_id', name: 'Catégorie' },
+                    { id: 'region_id', name: 'Région' },
+                    { id: 'city_id', name: 'Ville' },
+                    { id: 'place', name: 'Lieu' },
+                    { id: 'date', name: 'Date' },
+                    { id: 'time', name: 'Heure' }
+                ];
+
+                // Add organizer validation for admin users
+                @if(Auth::user()->role === 'admin')
+                const organizerTypeRadio = document.querySelector('input[name="organizer_type"]:checked');
+                if (organizerTypeRadio) {
+                    const organizerType = organizerTypeRadio.value;
+                    if (organizerType === 'new') {
+                        requiredFields.push({ id: 'organizer_title', name: 'Nom de l\'organisateur' });
+                    } else {
+                        requiredFields.push({ id: 'existing_organizer_id', name: 'Organisateur existant' });
+                    }
+                }
+                @endif
+
+                const missingFields = [];
+                
+                requiredFields.forEach(field => {
+                    const element = document.getElementById(field.id);
+                    if (!element || !element.value.trim()) {
+                        missingFields.push(field.name);
+                        if (element) {
+                            element.classList.add('is-invalid');
                         }
-                    }, 300);
+                    } else {
+                        if (element) {
+                            element.classList.remove('is-invalid');
+                        }
+                    }
+                });
+
+                return missingFields;
+            }
+
+            // Fill confirmation modal with form data
+            function fillConfirmationModal() {
+                const formData = {
+                    title: document.getElementById('title')?.value || '',
+                    description: document.getElementById('description')?.value || '',
+                    category: document.getElementById('category_id')?.selectedOptions[0]?.textContent || '',
+                    region: document.getElementById('region_id')?.selectedOptions[0]?.textContent || '',
+                    city: document.getElementById('city_id')?.selectedOptions[0]?.textContent || '',
+                    place: document.getElementById('place')?.value || '',
+                    date: document.getElementById('date')?.value || '',
+                    time: document.getElementById('time')?.value || ''
+                };
+
+                // Update modal content
+                const modalElements = {
+                    'confTitle': formData.title,
+                    'confDescription': formData.description,
+                    'confCategory': formData.category,
+                    'confRegion': formData.region,
+                    'confCity': formData.city,
+                    'confPlace': formData.place,
+                    'confDate': formData.date,
+                    'confTime': formData.time
+                };
+
+                Object.keys(modalElements).forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.textContent = modalElements[id];
+                    }
+                });
+
+                // Handle organizer info for admin users
+                @if(Auth::user()->role === 'admin')
+                const organizerTypeRadio = document.querySelector('input[name="organizer_type"]:checked');
+                if (organizerTypeRadio) {
+                    const organizerType = organizerTypeRadio.value;
+                    let organizerInfo = '';
+                    
+                    if (organizerType === 'new') {
+                        organizerInfo = document.getElementById('organizer_title')?.value || '';
+                    } else {
+                        const existingOrganizerSelect = document.getElementById('existing_organizer_id');
+                        const selectedOption = existingOrganizerSelect?.options[existingOrganizerSelect.selectedIndex];
+                        organizerInfo = selectedOption ? selectedOption.textContent : '';
+                    }
+                    
+                    const confOrganizerElement = document.getElementById('confOrganizer');
+                    if (confOrganizerElement) {
+                        confOrganizerElement.textContent = organizerInfo;
+                    }
+                }
+                @endif
+            }
+
+            // Confirmation modal event handlers
+            if (elements.openConfirmModalBtn) {
+                elements.openConfirmModalBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const missingFields = validateForm();
+                    
+                    if (missingFields.length > 0) {
+                        // Show validation error modal
+                        if (elements.validationErrorList) {
+                            elements.validationErrorList.innerHTML = missingFields.map(name => `<li>${name}</li>`).join('');
+                        }
+                        modalUtils.show(elements.validationErrorModalElement, validationErrorModal);
+                        return;
+                    }
+                    
+                    fillConfirmationModal();
+                    modalUtils.show(elements.confirmModalElement, confirmModal);
                 });
             }
-            // Search location logic
+
+            if (elements.confirmSubmitBtn) {
+                elements.confirmSubmitBtn.addEventListener('click', function() {
+                    if (elements.eventForm) {
+                        elements.eventForm.submit();
+                    }
+                });
+            }
+
+            // Map functionality
+            let map, marker, selectedLatLng, selectedAddress;
+            let mapInitialized = false;
+
+            function initializeMap() {
+                if (!mapInitialized && elements.mapModalElement) {
+                    try {
+                        map = L.map('eventMap').setView([31.7917, -7.0926], 6); // Morocco center
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19,
+                            attribution: '© OpenStreetMap'
+                        }).addTo(map);
+
+                        map.on('click', function(e) {
+                            if (marker) map.removeLayer(marker);
+                            marker = L.marker(e.latlng).addTo(map);
+                            selectedLatLng = e.latlng;
+                            
+                            // Reverse geocode
+                            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+                                .then(res => res.json())
+                                .then(data => {
+                                    selectedAddress = data.display_name || `${e.latlng.lat}, ${e.latlng.lng}`;
+                                    if (elements.mapAddress) {
+                                        elements.mapAddress.textContent = selectedAddress;
+                                    }
+                                })
+                                .catch(() => {
+                                    selectedAddress = `${e.latlng.lat}, ${e.latlng.lng}`;
+                                    if (elements.mapAddress) {
+                                        elements.mapAddress.textContent = selectedAddress;
+                                    }
+                                });
+                        });
+                        
+                        mapInitialized = true;
+                    } catch (error) {
+                        console.error('Error initializing map:', error);
+                    }
+                } else if (mapInitialized && map) {
+                    map.invalidateSize();
+                }
+            }
+
             function searchLocation() {
-                const query = mapSearchInput.value.trim();
-                mapSearchError.style.display = 'none';
-                if (!query) return;
+                const query = elements.mapSearchInput?.value.trim();
+                if (!query || !elements.mapSearchError) return;
+
+                elements.mapSearchError.style.display = 'none';
+                
                 fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&countrycodes=MA&limit=1`)
                     .then(res => res.json())
                     .then(results => {
@@ -518,59 +581,152 @@
                             marker = L.marker(latlng).addTo(map);
                             selectedLatLng = { lat: latlng[0], lng: latlng[1] };
                             selectedAddress = loc.display_name;
-                            mapAddress.textContent = selectedAddress;
+                            if (elements.mapAddress) {
+                                elements.mapAddress.textContent = selectedAddress;
+                            }
                         } else {
-                            mapSearchError.textContent = 'Lieu non trouvé.';
-                            mapSearchError.style.display = 'block';
+                            elements.mapSearchError.textContent = 'Lieu non trouvé.';
+                            elements.mapSearchError.style.display = 'block';
                         }
                     })
                     .catch(() => {
-                        mapSearchError.textContent = 'Erreur lors de la recherche.';
-                        mapSearchError.style.display = 'block';
+                        elements.mapSearchError.textContent = 'Erreur lors de la recherche.';
+                        elements.mapSearchError.style.display = 'block';
                     });
             }
-            if (mapSearchBtn) {
-                mapSearchBtn.addEventListener('click', searchLocation);
+
+            // Map modal event handlers
+            if (elements.openMapModalBtn) {
+                elements.openMapModalBtn.addEventListener('click', function() {
+                    modalUtils.show(elements.mapModalElement, mapModal);
+                    setTimeout(initializeMap, 300);
+                });
             }
-            if (mapSearchInput) {
-                mapSearchInput.addEventListener('keydown', function(e) {
+
+            if (elements.mapSearchBtn) {
+                elements.mapSearchBtn.addEventListener('click', searchLocation);
+            }
+
+            if (elements.mapSearchInput) {
+                elements.mapSearchInput.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         searchLocation();
                     }
                 });
             }
-            if (selectLocationBtn) {
-                selectLocationBtn.addEventListener('click', function() {
-                    if (selectedAddress) {
-                        placeInput.value = selectedAddress;
-                        if (typeof bootstrap !== 'undefined') {
-                            const mapModal = bootstrap.Modal.getInstance(mapModalElement);
-                            if (mapModal) mapModal.hide();
-                        } else {
-                            mapModalElement.style.display = 'none';
-                            mapModalElement.classList.remove('show');
-                            document.body.classList.remove('modal-open');
-                            const backdrop = document.querySelector('.modal-backdrop');
-                            if (backdrop) backdrop.remove();
-                        }
+
+            if (elements.selectLocationBtn) {
+                elements.selectLocationBtn.addEventListener('click', function() {
+                    if (selectedAddress && elements.placeInput) {
+                        elements.placeInput.value = selectedAddress;
+                        modalUtils.hide(elements.mapModalElement, mapModal);
                     }
                 });
             }
 
-            // Ensure map modal is fully hidden when close icon or cancel button is clicked
-            Array.from(closeMapModal).forEach(function(btn) {
+            // Close map modal handlers
+            Array.from(elements.closeMapModal).forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    if (typeof bootstrap !== 'undefined' && mapModal) {
-                        mapModal.hide();
-                    }
-                    mapModalElement.style.display = 'none';
-                    mapModalElement.classList.remove('show');
-                    document.body.classList.remove('modal-open');
-                    const backdrop = document.querySelector('.modal-backdrop');
-                    if (backdrop) backdrop.remove();
+                    modalUtils.hide(elements.mapModalElement, mapModal);
                 });
             });
+
+            // Close modals when clicking on backdrop
+            [elements.confirmModalElement, elements.validationErrorModalElement, elements.mapModalElement].forEach(modal => {
+                if (modal) {
+                    modal.addEventListener('click', function(e) {
+                        if (e.target === modal) {
+                            if (modal === elements.confirmModalElement) {
+                                modalUtils.hide(modal, confirmModal);
+                            } else if (modal === elements.validationErrorModalElement) {
+                                modalUtils.hide(modal, validationErrorModal);
+                            } else if (modal === elements.mapModalElement) {
+                                modalUtils.hide(modal, mapModal);
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Close buttons for all modals
+            const closeButtons = document.querySelectorAll('[data-bs-dismiss="modal"], .btn-close');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        if (modal === elements.confirmModalElement) {
+                            modalUtils.hide(modal, confirmModal);
+                        } else if (modal === elements.validationErrorModalElement) {
+                            modalUtils.hide(modal, validationErrorModal);
+                        } else if (modal === elements.mapModalElement) {
+                            modalUtils.hide(modal, mapModal);
+                        }
+                    }
+                });
+            });
+
+            // Region/City dynamic loading (if not already handled by inline script)
+            const regionSelect = document.getElementById('region_id');
+            const citySelect = document.getElementById('city_id');
+            
+            if (regionSelect && citySelect) {
+                regionSelect.addEventListener('change', function() {
+                    const selectedOption = regionSelect.options[regionSelect.selectedIndex];
+                    const cities = selectedOption.getAttribute('data-cities');
+                    
+                    citySelect.innerHTML = '<option value="">Sélectionner une ville</option>';
+                    
+                    if (cities) {
+                        try {
+                            const citiesArr = JSON.parse(cities);
+                            if (citiesArr.length > 0) {
+                                citySelect.disabled = false;
+                                citiesArr.forEach(city => {
+                                    const option = document.createElement('option');
+                                    option.value = city.id;
+                                    option.textContent = city.name;
+                                    citySelect.appendChild(option);
+                                });
+                            } else {
+                                citySelect.disabled = true;
+                            }
+                        } catch (error) {
+                            console.error('Error parsing cities data:', error);
+                            citySelect.disabled = true;
+                        }
+                    } else {
+                        citySelect.disabled = true;
+                    }
+                });
+            }
+
+            // Organizer type toggle (for admin users)
+            @if(Auth::user()->role === 'admin')
+            const newOrganizerRadio = document.getElementById('new_organizer');
+            const existingOrganizerRadio = document.getElementById('existing_organizer');
+            const newOrganizerSection = document.getElementById('new_organizer_section');
+            const existingOrganizerSection = document.getElementById('existing_organizer_section');
+
+            function toggleOrganizerSection() {
+                if (newOrganizerRadio && existingOrganizerRadio && newOrganizerSection && existingOrganizerSection) {
+                    if (newOrganizerRadio.checked) {
+                        newOrganizerSection.style.display = '';
+                        existingOrganizerSection.style.display = 'none';
+                    } else {
+                        newOrganizerSection.style.display = 'none';
+                        existingOrganizerSection.style.display = '';
+                    }
+                }
+            }
+
+            if (newOrganizerRadio) {
+                newOrganizerRadio.addEventListener('change', toggleOrganizerSection);
+            }
+            if (existingOrganizerRadio) {
+                existingOrganizerRadio.addEventListener('change', toggleOrganizerSection);
+            }
+            @endif
         });
     </script>
 </x-app-layout>

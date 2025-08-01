@@ -41,8 +41,12 @@ class DashboardController extends Controller
                     ->distinct()->orderBy('year', 'desc')->pluck('year');
             }
             $selectedYear = $request->input('year', now()->year);
+            $selectedRegion = $request->input('region', '');
 
-            // Events per month for line graph (selected year)
+            // Get all regions for the dropdown
+            $regions = Region::orderBy('name')->get();
+
+            // Events per month for line graph (selected year and region)
             $months = collect(range(1, 12))->map(function ($i) use ($selectedYear) {
                 return sprintf('%04d-%02d', $selectedYear, $i);
             });
@@ -58,19 +62,31 @@ class DashboardController extends Controller
                         ->where('organizer_id', Auth::user()->organizer->id)
                         ->orderBy('created_at', 'desc')
                         ->paginate(4);
-                $eventsPerMonth = Event::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
+                
+                // Build events per month query with region filter
+                $eventsPerMonthQuery = Event::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
                     ->where('organizer_id', Auth::user()->organizer->id)
-                    ->whereYear('created_at', $selectedYear)
-                    ->groupBy('month')
-                    ->pluck('count', 'month');
+                    ->whereYear('created_at', $selectedYear);
+                
+                if ($selectedRegion) {
+                    $eventsPerMonthQuery->where('region_id', $selectedRegion);
+                }
+                
+                $eventsPerMonth = $eventsPerMonthQuery->groupBy('month')->pluck('count', 'month');
             } else {
                 $newEvents = Event::whereIn('status', ['new','updated'])
                         ->orderBy('created_at', 'desc')
                         ->paginate(4);
-                $eventsPerMonth = Event::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
-                    ->whereYear('created_at', $selectedYear)
-                    ->groupBy('month')
-                    ->pluck('count', 'month');
+                
+                // Build events per month query with region filter
+                $eventsPerMonthQuery = Event::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
+                    ->whereYear('created_at', $selectedYear);
+                
+                if ($selectedRegion) {
+                    $eventsPerMonthQuery->where('region_id', $selectedRegion);
+                }
+                
+                $eventsPerMonth = $eventsPerMonthQuery->groupBy('month')->pluck('count', 'month');
             }
             $eventsPerMonthData = $months->map(function($month) use ($eventsPerMonth) {
                 return [
@@ -86,7 +102,9 @@ class DashboardController extends Controller
                     'newEvents',
                     'eventsPerMonthData',
                     'years',
-                    'selectedYear'
+                    'selectedYear',
+                    'regions',
+                    'selectedRegion'
                 ));
             }
             return view('dashboard', compact(
@@ -98,7 +116,9 @@ class DashboardController extends Controller
                 'newEvents',
                 'eventsPerMonthData',
                 'years',
-                'selectedYear'
+                'selectedYear',
+                'regions',
+                'selectedRegion'
             ));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error fetching statistics: ' . $e->getMessage());
